@@ -1,0 +1,27 @@
+# Credentials and local configuration
+.env
+.streamlit/secrets.toml
+
+# Python and Streamlit runtime files
+__pycache__/
+*.py[cod]
+.venv/
+_streamlit_*.log
+
+# Local databases, backups, and generated artifacts
+*.sql
+*.sql.gz
+*.bak
+data/
+output/
+outputs/
+assets/uploads/
+
+# Local tools and IDE state
+node_modules/
+.idea/
+.agents/
+
+# Keep the share-safe app configuration and a non-secret Secrets template
+!.streamlit/config.toml
+!.streamlit/secrets.toml.example

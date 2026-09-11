@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    html, body { margin: 0; overflow: hidden; background: transparent; }
+    #splitter { position: relative; height: 16px; display: flex; align-items: center; justify-content: center; cursor: row-resize; user-select: none; touch-action: none; }
+    #splitter::before { content: ""; width: 100%; border-top: 1px solid rgba(49, 51, 63, .3); }
+    #grip { position: absolute; z-index: 1; padding: 0 14px; background: #e9f4ff; color: #52657b; font: 700 13px/16px sans-serif; letter-spacing: 3px; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="splitter" title="拖曳調整上下區域高度"><span id="grip">•••</span></div>
+  <script>
+    const splitter = document.getElementById("splitter");
+    const grip = document.getElementById("grip");
+    let topHeight = 350;
+    let minTop = 200;
+    let maxTop = 600;
+    let dragging = false;
+    let pointerId = null;
+    let startY = 0;
+    let startHeight = 0;
+
+    const send = (type, data) => parent.postMessage({ isStreamlitMessage: true, type, ...data }, "*");
+    const clamp = (value) => Math.max(minTop, Math.min(maxTop, value));
+
+    const preview = (event) => {
+      if (!dragging) return;
+      grip.textContent = `${clamp(startHeight + event.clientY - startY)}px`;
+    };
+
+    const finish = (event) => {
+      if (!dragging) return;
+      const nextHeight = clamp(startHeight + event.clientY - startY);
+      dragging = false;
+      grip.textContent = "•••";
+      if (pointerId !== null) {
+        try { splitter.releasePointerCapture(pointerId); } catch (_) {}
+      }
+      pointerId = null;
+      send("streamlit:setComponentValue", { value: { top_height: nextHeight }, dataType: "json" });
+    };
+
+    window.addEventListener("message", (event) => {
+      if (event.data?.type !== "streamlit:render") return;
+      const args = event.data.args || {};
+      topHeight = Number(args.top_height ?? topHeight);
+      minTop = Number(args.min_top ?? minTop);
+      maxTop = Number(args.max_top ?? maxTop);
+      send("streamlit:setFrameHeight", { height: 16 });
+    });
+
+    splitter.addEventListener("pointerdown", (event) => {
+      dragging = true;
+      pointerId = event.pointerId;
+      startY = event.clientY;
+      startHeight = topHeight;
+      try { splitter.setPointerCapture(pointerId); } catch (_) {}
+      event.preventDefault();
+    });
+    splitter.addEventListener("pointermove", preview);
+    splitter.addEventListener("pointerup", finish);
+    splitter.addEventListener("pointercancel", finish);
+    splitter.addEventListener("lostpointercapture", finish);
+    send("streamlit:componentReady", { apiVersion: 1 });
+    send("streamlit:setFrameHeight", { height: 16 });
+  </script>
+</body>
+</html>
