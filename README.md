@@ -4,6 +4,7 @@ An interactive demo of an order, inventory, purchasing, delivery, and accounts w
 
 ## Demo access
 
+- Live app: https://6htsn6nzvucywh6rkadkur.streamlit.app/
 - Username: `demo_admin`
 - Password: `demo_admin`
 
