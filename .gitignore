@@ -13,6 +13,9 @@ _streamlit_*.log
 *.sql.gz
 *.bak
 data/
+# The UI translation dictionary is required at runtime and contains no business data.
+!data/
+!data/term_dictionary.xlsx
 output/
 outputs/
 assets/uploads/
