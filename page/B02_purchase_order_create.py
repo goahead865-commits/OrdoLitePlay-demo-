@@ -232,6 +232,9 @@ try:
     _HAS_REPORTLAB = True
 except Exception:
     _HAS_REPORTLAB = False
+    # Keep module-level PDF helper defaults evaluable even when ReportLab is
+    # unavailable. PDF generation itself remains guarded by _HAS_REPORTLAB.
+    mm = 2.834645669
 
 
 # ------------------------------
